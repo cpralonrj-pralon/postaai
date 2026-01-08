@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 
-type PanelType = 'ai' | 'templates' | 'texto' | 'fotos' | 'elementos' | 'uploads' | null;
+type PanelType = 'ai' | 'templates' | 'texto' | 'fotos' | 'elementos' | 'uploads' | 'apps' | null;
 
 const sidebarItems = [
   { id: 'ai' as PanelType, label: 'AI', icon: 'auto_awesome', filled: true },
@@ -10,15 +10,47 @@ const sidebarItems = [
   { id: 'fotos' as PanelType, label: 'Fotos', icon: 'image', filled: false },
   { id: 'elementos' as PanelType, label: 'Elementos', icon: 'shapes', filled: false },
   { id: 'uploads' as PanelType, label: 'Uploads', icon: 'cloud_upload', filled: false },
+  { id: 'apps' as PanelType, label: 'Apps', icon: 'apps', filled: true },
+];
+
+const appsList = [
+  { name: 'AI Music', icon: 'music_note', category: 'ai' },
+  { name: 'Image Upscaler', icon: 'zoom_in', category: 'ai' },
+  { name: 'Gen QR', icon: 'qr_code', category: 'ai' },
+  { name: 'Reface', icon: 'face', category: 'ai' },
+  { name: 'Voice AI', icon: 'record_voice_over', category: 'ai' },
+  { name: 'AI Slides', icon: 'slideshow', category: 'ai' },
+  { name: 'Colorize', icon: 'palette', category: 'tools' },
+  { name: 'Background', icon: 'wallpaper', category: 'tools' },
+  { name: 'Mockups', icon: 'devices', category: 'tools' },
+  { name: 'Translate', icon: 'translate', category: 'tools' },
+  { name: 'Charts', icon: 'bar_chart', category: 'tools' },
+  { name: 'Videos', icon: 'videocam', category: 'tools' },
 ];
 
 const Editor: React.FC = () => {
   const [selectedSlide, setSelectedSlide] = useState(1);
   const [textColor, setTextColor] = useState('#111118');
   const [activePanel, setActivePanel] = useState<PanelType>('ai');
+  const [isPanelPinned, setIsPanelPinned] = useState(true);
 
-  const togglePanel = (panelId: PanelType) => {
-    setActivePanel(prev => prev === panelId ? null : panelId);
+  const handleMouseEnter = (panelId: PanelType) => {
+    setActivePanel(panelId);
+  };
+
+  const handleMouseLeave = () => {
+    if (!isPanelPinned) {
+      setActivePanel(null);
+    }
+  };
+
+  const handlePanelClick = (panelId: PanelType) => {
+    if (activePanel === panelId) {
+      setIsPanelPinned(!isPanelPinned);
+    } else {
+      setActivePanel(panelId);
+      setIsPanelPinned(true);
+    }
   };
 
   const renderPanelContent = () => {
@@ -144,6 +176,52 @@ const Editor: React.FC = () => {
             <p className="text-xs text-slate-400 text-center">Arraste e solte ou clique para fazer upload</p>
           </div>
         );
+      case 'apps':
+        return (
+          <div className="p-5 space-y-4">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="material-symbols-outlined text-primary icon-filled">apps</span>
+              <h3 className="text-lg font-bold text-slate-900">Aplicativos</h3>
+            </div>
+            <input type="text" placeholder="Buscar aplicativos..." className="w-full h-10 px-4 rounded-lg border border-slate-200 text-sm focus:ring-primary focus:border-primary" />
+
+            {/* Tabs */}
+            <div className="flex border-b border-slate-200">
+              <button className="flex-1 py-2 text-sm font-semibold text-primary border-b-2 border-primary">Descobrir</button>
+              <button className="flex-1 py-2 text-sm font-medium text-slate-500 hover:text-slate-700">Seus apps</button>
+            </div>
+
+            {/* AI Generation Section */}
+            <div className="space-y-3">
+              <label className="text-xs font-bold text-slate-500 uppercase">Geração com IA</label>
+              <div className="grid grid-cols-4 gap-2">
+                {appsList.filter(app => app.category === 'ai').map(app => (
+                  <button key={app.name} className="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-slate-50 transition-colors group">
+                    <div className="size-12 rounded-xl bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center text-primary group-hover:scale-105 transition-transform">
+                      <span className="material-symbols-outlined">{app.icon}</span>
+                    </div>
+                    <span className="text-[10px] text-slate-600 text-center leading-tight">{app.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Tools Section */}
+            <div className="space-y-3">
+              <label className="text-xs font-bold text-slate-500 uppercase">Ferramentas</label>
+              <div className="grid grid-cols-4 gap-2">
+                {appsList.filter(app => app.category === 'tools').map(app => (
+                  <button key={app.name} className="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-slate-50 transition-colors group">
+                    <div className="size-12 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600 group-hover:scale-105 transition-transform">
+                      <span className="material-symbols-outlined">{app.icon}</span>
+                    </div>
+                    <span className="text-[10px] text-slate-600 text-center leading-tight">{app.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
       default:
         return null;
     }
@@ -175,15 +253,19 @@ const Editor: React.FC = () => {
       </header>
 
       <div className="flex flex-1 overflow-hidden">
-        {/* Icon Sidebar */}
-        <aside className="w-[72px] bg-white border-r border-slate-200 flex flex-col items-center py-3 gap-1 shrink-0">
+        {/* Icon Sidebar with Hover */}
+        <aside
+          className="w-[72px] bg-white border-r border-slate-200 flex flex-col items-center py-3 gap-1 shrink-0"
+          onMouseLeave={handleMouseLeave}
+        >
           {sidebarItems.map(item => (
             <button
               key={item.id}
-              onClick={() => togglePanel(item.id)}
+              onClick={() => handlePanelClick(item.id)}
+              onMouseEnter={() => handleMouseEnter(item.id)}
               className={`flex flex-col items-center gap-0.5 py-2 px-1 w-full rounded-lg transition-all ${activePanel === item.id
-                  ? 'text-primary bg-primary/5'
-                  : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
+                ? 'text-primary bg-primary/5'
+                : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
                 }`}
             >
               <div className={`size-9 rounded-lg flex items-center justify-center ${activePanel === item.id ? 'bg-primary/10' : ''}`}>
@@ -198,9 +280,20 @@ const Editor: React.FC = () => {
 
         {/* Expandable Panel */}
         {activePanel && (
-          <aside className="w-[280px] bg-white border-r border-slate-200 flex flex-col overflow-y-auto shrink-0 shadow-sm">
-            <div className="h-12 px-4 border-b border-slate-100 flex items-center justify-end shrink-0">
-              <button onClick={() => setActivePanel(null)} className="text-slate-400 hover:text-slate-600">
+          <aside
+            className="w-[280px] bg-white border-r border-slate-200 flex flex-col overflow-y-auto shrink-0 shadow-sm"
+            onMouseEnter={() => setActivePanel(activePanel)}
+            onMouseLeave={handleMouseLeave}
+          >
+            <div className="h-12 px-4 border-b border-slate-100 flex items-center justify-between shrink-0">
+              <button
+                onClick={() => setIsPanelPinned(!isPanelPinned)}
+                className={`text-slate-400 hover:text-slate-600 ${isPanelPinned ? 'text-primary' : ''}`}
+                title={isPanelPinned ? 'Desafixar painel' : 'Fixar painel'}
+              >
+                <span className="material-symbols-outlined text-lg">{isPanelPinned ? 'push_pin' : 'push_pin'}</span>
+              </button>
+              <button onClick={() => { setActivePanel(null); setIsPanelPinned(false); }} className="text-slate-400 hover:text-slate-600">
                 <span className="material-symbols-outlined text-lg">close</span>
               </button>
             </div>

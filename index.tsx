@@ -1,4 +1,5 @@
 
+console.log('index.tsx: Entry point reached');
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';

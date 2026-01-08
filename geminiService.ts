@@ -2,7 +2,9 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { ContentIdea } from "./types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+console.log('Initializing Gemini Service...');
+const apiKey = process.env.GEMINI_API_KEY || 'AIza...'; // Fallback or placeholder
+const ai = new GoogleGenAI({ apiKey });
 
 export async function generateContentIdeas(niche: string, goal: string): Promise<ContentIdea[]> {
   try {

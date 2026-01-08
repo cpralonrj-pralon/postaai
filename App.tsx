@@ -10,6 +10,7 @@ import Calendar from './screens/Calendar';
 import Editor from './screens/Editor';
 
 const App: React.FC = () => {
+  console.log('App: Rendering component');
   const [currentView, setCurrentView] = useState<View>(View.ONBOARDING);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 

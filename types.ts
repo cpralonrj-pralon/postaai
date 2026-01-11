@@ -15,7 +15,14 @@ export interface ContentIdea {
   description?: string;
   structure?: string[];
   cta?: string;
+  caption?: string;
+  callToAction?: string;
   image?: string;
+  isEdited?: boolean;
+  isFavorite?: boolean;
+  isUsed?: boolean;
+  createdAt?: string;
+  bestTime?: string; // Sugestão de melhor dia/hora para postar
 }
 
 export interface ScheduledContent {
